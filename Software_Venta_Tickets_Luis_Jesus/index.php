@@ -1,5 +1,5 @@
 <?php
-
+    //se incluye e archivo de funciones para conectar a la bases de datos
     include './libraries/db_funciones.php';
 
 ?>
