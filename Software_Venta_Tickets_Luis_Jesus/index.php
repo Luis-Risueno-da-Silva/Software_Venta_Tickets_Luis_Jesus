@@ -90,6 +90,8 @@
             
                 // Cuando ocurre un post
                 if ($_SERVER["REQUEST_METHOD"] == "POST") {
+                    
+                    // Variable para iniciar la sesión
                     $correo__inicio = filter_input(INPUT_POST, 'correo__inicio--sesion');
                     $contraseña__inicio = filter_input(INPUT_POST, 'pass__inicio--sesion');
 
