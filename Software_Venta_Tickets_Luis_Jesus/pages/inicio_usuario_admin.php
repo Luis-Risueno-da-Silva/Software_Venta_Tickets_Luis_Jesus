@@ -36,6 +36,41 @@
             <h2 class="centrar">Esta es la pantalla de administración</h2>
             <p class="centrar">Por favor, seleccione una opción</p>
             
+            <!-- Mostrar lista de usuarios registrados -->
+            <a class="btn btn-primary mb-3" href="./inicio_usuario_admin.php?accion=mostrar_usuarios" role="button">Listar Usuarios Registrados</a>
+            
+            <br>
+            <!-- Insertar tickets -->
+            <a class="btn btn-primary mb-3" href="insertar_tickets.php" role="button">Insertar Tickets</a>
+            
+            <br>
+            
+            <!-- Cerrar la sesión -->
+            <a class="btn btn-primary mb-3" href="./inicio_usuario_admin.php?accion=cerrar_sesion" role="button">Cerrar sesión</a>
+            
+            
+            <?php
+
+                $accion = filter_input(INPUT_GET, 'accion');
+                
+                if(isset($accion)){
+                    
+                    // Mostrar los tickets que tiene el usuario
+                    if($accion == 'mostrar_usuarios'){
+                        listarUsuarios();
+                    }
+                    
+                    
+                    // Cerrar la sesión
+                    if($accion == "cerrar_sesion"){
+                        $nombre = $_COOKIE['nombreUsuario'];
+                        $id = $_COOKIE['idUsuario'];
+                        cerrarSesion($nombre, $id);
+                    }//if
+                    
+                }
+                
+            ?>
 
             
         </main>

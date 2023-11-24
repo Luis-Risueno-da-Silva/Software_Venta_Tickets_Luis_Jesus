@@ -1,5 +1,24 @@
 <?php
 
+//establecer conexion con la base de datos (por separado para llamarla)
+function getConexion() {
+    $servername = "127.0.0.1";
+        $username = "root";
+        $password = "";
+        $database = "software_venta_tickets";
+    try {
+        $conexion = new PDO("mysql:host=$servername;dbname=$database;charset=utf8",
+                $username, $password);
+        $conexion->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        return $conexion;
+    } catch (PDOException $e) {
+        echo "Error: " . $e->getMessage();
+        return null;
+    }
+}
+
+
+
 /**
  * Comprueba que los datos son correctos para iniciar sesión
  * 
@@ -230,3 +249,35 @@ function comprobarUsuario($rol, $id, $nombre){
     }
     
 }
+
+
+/**funcion que recibe 4 parmetros y los inserta en la base de datos para dar de alta nuevos usuarios
+ * 
+ * @param string $correo email del usuario
+ * @param string $nombre nombre del usuario
+ * @param string $contraseña contraseña del usuario
+ * @param integer $rol rol para el usuario (siempre 0 -> no admin)
+ */
+function insertarUsuario($correo, $nombre, $contraseña, $rol) {
+    $consulta = "insert into usuarios (correo, nombre, contraseña) "
+            . " values(?, ?, ?, ?, ?,?,?,?, ?, ? )";
+    $conn = getConexion();
+    if ($conn == null){
+        echo "Error con la base de datos: ". $ex->getMessage();
+    }else {
+        try {
+            
+            $sentencia = $conn->prepare($consulta);
+            $sentencia->bindParam(1, $correo);
+            $sentencia->bindParam(3, $nombre);
+            $sentencia->bindParam(2, $contraseña);
+            $sentencia->bindParam(4, $rol);
+            
+            $num = $sentencia->execute();
+            return $conn->lastInsertId();
+        } catch (PDOException $e) {
+            return $e->getMessage();
+        }
+    }//fin else
+}
+

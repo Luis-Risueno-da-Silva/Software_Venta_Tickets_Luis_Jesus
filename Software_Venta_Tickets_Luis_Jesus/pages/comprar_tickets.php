@@ -40,7 +40,7 @@
 <html lang="es">
     <head>
         <meta charset="UTF-8">
-        <title>Inicio Usuario</title>
+        <title>Comprar Tickets</title>
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
         <link rel="stylesheet" href="../css/styles.css">
     </head>
@@ -55,15 +55,13 @@
                 <span class="text-primary"><?php echo $_COOKIE['nombreUsuario']; ?></span></h1>
             <p class="centrar">Por favor, selecciona una de las siguientes funciones</p>
 
-            <!-- Mostrar los ticktes del usuario -->
-            <a class="btn btn-primary mb-3" href="./inicio_usuario_normal.php?accion=mostrar_tickets" role="button">Mostrar tickets</a>
-            
-            <br>
-            
-            
             <!-- Comprar tickets -->
-            <a class="btn btn-primary mb-3" href="comprar_tickets.php" role="button">Comprar Tickets</a>
+            
+            <!-- listar los tickets para poder comprar -->
+            
+            <a class="btn btn-primary mb-3" href="./inicio_usuario_normal.php?accion=comprar_tickets" role="button">Comprar</a>
             <br>
+            
             <!-- Cerrar la sesión -->
             <a class="btn btn-primary mb-3" href="./inicio_usuario_normal.php?accion=cerrar_sesion" role="button">Cerrar sesión</a>
             
@@ -75,8 +73,8 @@
                 if(isset($accion)){
                     
                     // Mostrar los tickets que tiene el usuario
-                    if($accion == 'mostrar_tickets'){
-                        mostrarTickets();
+                    if($accion == 'comprar_tickets'){
+                        comprarTickets();
                     }
                     
                     
