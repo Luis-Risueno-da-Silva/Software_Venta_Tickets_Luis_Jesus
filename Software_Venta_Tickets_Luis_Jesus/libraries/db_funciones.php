@@ -1,24 +1,5 @@
 <?php
 
-//establecer conexion con la base de datos (por separado para llamarla)
-function getConexion() {
-    $servername = "127.0.0.1";
-        $username = "root";
-        $password = "";
-        $database = "software_venta_tickets";
-    try {
-        $conexion = new PDO("mysql:host=$servername;dbname=$database;charset=utf8",
-                $username, $password);
-        $conexion->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        return $conexion;
-    } catch (PDOException $e) {
-        echo "Error: " . $e->getMessage();
-        return null;
-    }
-}
-
-
-
 /**
  * Comprueba que los datos son correctos para iniciar sesión
  * 
@@ -56,7 +37,10 @@ function iniciarSesion($correo, $contra){
         cerrarConexion($result, $conn);
         
     } catch (Exception $ex) {
-        echo "Error con la base de datos: ". $ex->getMessage();
+        echo '<div class="alert alert-info" role="alert">
+                La página está en mantenimiento, intenta acceder más tarde.
+                Disculpa las molestias.
+             </div>';
     }
     
 }
@@ -92,35 +76,84 @@ function cerrarConexion($result, $conn){
 }
 
 /**
- * Esta función muestra los tickets del usuario
+ * Esta función muestra los tickets del usuario.
  */
 function mostrarTickets(){
     
-    
-    
-    $id = $_COOKIE['idUsuario'];
-    
-    // Se hace la conexión a la Base de datos
-    $conn = realizarConexionBD();
-    
-    $sql = "select nombre_ticket, CONCAT(precio, '€') 'Precio', fecha_ven from tickets 
-            where id_ticket IN (SELECT id_ticket FROM compras WHERE id_usuario = ".$id.")";
-    $result = mysqli_query($conn, $sql);
-    
-    
-    // Comprobar que la consulta devuelve filas
-    if($result->num_rows == 0){
+    try {
         
-        while ($fila = mysqli_fetch_assoc($result)) {
-
-            echo $fila['nombre_ticket'];
-            
-        }//while
-    }//if
+        echo '<p class="fs-3 fw-bold text-success">Tus tickets son los sigueintes:</p>';
     
-    cerrarConexion($result, $conn);
+        $id = $_COOKIE['idUsuario'];
+
+        // Se hace la conexión a la Base de datos
+        $conn = realizarConexionBD();
+
+        // Se hace la consulta a la Base de Datos
+        $sql = "select nombre_ticket, CONCAT(precio, '€') 'Precio', fecha_ven from tickets 
+                where id_ticket IN (SELECT id_ticket FROM compras WHERE id_usuario = ".$id.")";
+        $result = mysqli_query($conn, $sql);
+    
+        // Comprobar que la consulta devuelve filas
+        if($result->num_rows != 0){
+            
+            // Se llama a la función que muestra la tabla con los tickets.
+            tablaTicketsUsuario($result);
+            
+        }else{
+            echo '<div class="alert alert-danger" role="alert">
+                    No hay ningún ticket a tu nombre
+                  </div>';
+        }
+
+        cerrarConexion($result, $conn);
+        
+    } catch (Exception $exc) {
+        echo '<div class="alert alert-info" role="alert">
+                La página se encuentra en mantenimiento, 
+                inténtalo de nuevo más tarde.
+             </div>';
+    }
+
     
 }
+
+/**
+ * Esta función genera la tabla con la información de los
+ * tickets que el usuario ha comprado.
+ * 
+ * Esta función se crea para que la función "mostrarTickets()"
+ * no tenga tantas líneas de código.
+ */
+function tablaTicketsUsuario($result){
+    
+        echo '<table class="table table-striped-columns">';
+            
+            echo '<tr>';
+            
+                echo '<th>Nombre del ticket</th>';
+                
+                echo '<th>Precio del ticket</th>';
+                
+                echo '<th>Fecha de vencimiento</th>';
+            
+            echo '</tr>';
+        
+            while ($fila = mysqli_fetch_assoc($result)) {
+
+                echo '<tr>';
+                    echo '<td>'.$fila['nombre_ticket'].'</td>';
+                    echo '<td>'.$fila['Precio'].'</td>';
+                    echo '<td>'.$fila['fecha_ven'].'</td>';
+                echo '</tr>';             
+
+            }//while
+        
+        echo '</table>';
+    
+}
+
+
 
 
 
@@ -244,40 +277,10 @@ function comprobarUsuario($rol, $id, $nombre){
     //Rol 1 ---> Usuario Admin
     if($rol == 1){
         session_start();
-        $_SESSION['rol'] = 1; // Crear una sesión`para el administrador
+        $_SESSION['rol'] = 1; 
+        $_SESSION['id_usuario'] = $id; 
+        $_SESSION['nombre'] = $nombre;
         header('Location: ./pages/inicio_usuario_admin.php');
     }
     
 }
-
-
-/**funcion que recibe 4 parmetros y los inserta en la base de datos para dar de alta nuevos usuarios
- * 
- * @param string $correo email del usuario
- * @param string $nombre nombre del usuario
- * @param string $contraseña contraseña del usuario
- * @param integer $rol rol para el usuario (siempre 0 -> no admin)
- */
-function insertarUsuario($correo, $nombre, $contraseña, $rol) {
-    $consulta = "insert into usuarios (correo, nombre, contraseña) "
-            . " values(?, ?, ?, ?, ?,?,?,?, ?, ? )";
-    $conn = getConexion();
-    if ($conn == null){
-        echo "Error con la base de datos: ". $ex->getMessage();
-    }else {
-        try {
-            
-            $sentencia = $conn->prepare($consulta);
-            $sentencia->bindParam(1, $correo);
-            $sentencia->bindParam(3, $nombre);
-            $sentencia->bindParam(2, $contraseña);
-            $sentencia->bindParam(4, $rol);
-            
-            $num = $sentencia->execute();
-            return $conn->lastInsertId();
-        } catch (PDOException $e) {
-            return $e->getMessage();
-        }
-    }//fin else
-}
-
