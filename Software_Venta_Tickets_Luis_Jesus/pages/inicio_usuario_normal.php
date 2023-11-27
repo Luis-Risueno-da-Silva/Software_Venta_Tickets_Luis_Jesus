@@ -61,12 +61,12 @@
             <br>
             
             <!-- Mostrar una lista con los ticktes que se pueden comprar -->
-            <a class="btn btn-primary mb-3" href="./inicio_usuario_normal.php?accion=comprar_tickets">Comprar tickets</a>
+            <a class="btn btn-primary mb-3" href="./inicio_usuario_normal.php?accion=comprar_tickets_lista">Comprar tickets</a>
             
             <br>
             
             <!-- Cerrar la sesión -->
-            <a class="btn btn-primary mb-3" href="./inicio_usuario_normal.php?accion=cerrar_sesion" role="button">Cerrar sesión</a>
+            <a class="btn btn-secondary mb-3" href="./inicio_usuario_normal.php?accion=cerrar_sesion" role="button">Cerrar sesión</a>
             
             
             <?php
@@ -80,10 +80,15 @@
                         mostrarTickets();
                     }
                     
-                    // Mostrar los tickets que existen para que se compren
-                    if($accion == 'comprar_tickets'){
+                    // Mostrar la lista de los tickets que se pueden comprar
+                    if($accion == 'comprar_tickets_lista'){
                         include './lista_tickets.php';
                     }
+                   
+                    /*
+                     *  Mostrar los ticktes del usuario, para que este seleccione
+                     *  el ticket que desea borrar.
+                     */
                     
                     // Cerrar la sesión
                     if($accion == "cerrar_sesion"){
@@ -92,6 +97,15 @@
                         cerrarSesion($nombre, $id);
                     }//if
                     
+                }
+                
+                // Comprar ticket seleccionado en la lista
+                if ($_SERVER["REQUEST_METHOD"] == "POST") {
+
+                    $idTicket = filter_input(INPUT_POST, 'tipo_ticket');
+                    if(isset($idTicket)){
+                        insertartCompraUsuario($idTicket);
+                    } 
                 }
                 
             ?>

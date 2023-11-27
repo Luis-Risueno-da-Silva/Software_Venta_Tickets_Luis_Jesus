@@ -11,20 +11,21 @@
     <body>
         
         <!-- Formulario que contiene el Select-->
-        <form method="post" action="<?php echo $_SERVER['PHP_SELF']; ?>">
+        <form method="post" action="./inicio_usuario_normal.php">
             
             <!-- Select con los tickets que se pueden comprar-->
-            <select class="form-select mb-3" aria-label="Default select example">
+            <select class="form-select mb-3" aria-label="Default select example" name="tipo_ticket">
                 <option selected>Selecciona una opción...</option>
-                    <option value="Concierto de Beyoncé">Concierto de Beyoncé</option>
-                    <option value="Concierto de Ariana Grande">Concierto de Ariana Grande</option>
-                    <option value="Partido del Real Madrid">Partido del Real Madrid</option>
-                    <option value="Partido del Betis">Partido del Betis</option>
-                    <option value="Fórmula 1">Fórmula 1</option>
+                    <option value="1">Concierto de Ariana Grande</option>
+                    <option value="2">Partido del Real Madrid</option>
+                    <option value="3">Partido del Betis</option>
+                    <option value="4">Concierto de Beyoncé</option>
+                    <option value="5">Fórmula 1</option>
             </select>
             
             <button type="submit" class="btn btn-success mb-3">Comprar ticket</button>
         </form>
+        
         
     </body>
     <!-- Fin del body -->

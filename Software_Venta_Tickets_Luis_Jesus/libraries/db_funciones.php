@@ -33,8 +33,6 @@ function iniciarSesion($correo, $contra){
             
         }
         
-        //Se cierra la conexión a la Base de Datos
-        cerrarConexion($result, $conn);
         
     } catch (Exception $ex) {
         echo '<div class="alert alert-info" role="alert">
@@ -59,21 +57,7 @@ function cerrarSesion($nombre, $id){
     
 }
 
-/**
- * Esta función cierra la conexión a la Base de Datos
- * 
- * @param type $result
- * @param type $conn
- */
-function cerrarConexion($result, $conn){
-    
-    // Liberar el resultado
-    mysqli_free_result($result);
 
-    // Cerrar la conexión
-    mysqli_close($conn);
-    
-}
 
 /**
  * Esta función muestra los tickets del usuario.
@@ -105,8 +89,6 @@ function mostrarTickets(){
                     No hay ningún ticket a tu nombre
                   </div>';
         }
-
-        cerrarConexion($result, $conn);
         
     } catch (Exception $exc) {
         echo '<div class="alert alert-info" role="alert">
@@ -153,7 +135,71 @@ function tablaTicketsUsuario($result){
     
 }
 
+/**
+ * Esta función inserta una nueva compra del usuario.
+ * 
+ * @param [int] $idTicket
+ */
+function insertartCompraUsuario($idTicket){
+    
+    try {
+        
+        $idUsuario = $_COOKIE['idUsuario'];
 
+        // Comprobar que la compra no se repite      
+        $yaInsertado = comprobarCompra($idUsuario, $idTicket);
+        
+        if($yaInsertado == true){
+            echo '<div class="alert alert-danger" role="alert">
+                    Ya has comprado un ticket para ese evento.
+                </div>';
+        }else{
+            // Se hace la conexión a la Base de datos
+            $conn = realizarConexionBD();
+
+            // Se hace la consulta a la Base de Datos
+            $sql = "INSERT INTO compras (id_usuario, id_ticket, fecha_compra) VALUES (".$idUsuario.", ".$idTicket.", CURDATE())";
+            $result = mysqli_query($conn, $sql);    
+
+            echo '<div class="alert alert-success" role="alert">
+                    Compra realizada con éxito.
+                  </div>';
+            
+        }
+        
+    } catch (Exception $exc) {
+        echo '<div class="alert alert-danger" role="alert">
+                La página está en mantenimiento, inténtalo de nuevo más tarde
+              </div>';
+    }
+    
+}
+
+/**
+ * Esta función comprueba que el usuario no haya hecho 
+ * la compra con anterioridad. Para evitar que el usuario compre
+ * 2 veces el mismo ticket.
+ * 
+ * @param [int] $idUsuario
+ * @param [int] $idTicket
+ * @return bool
+ */
+function comprobarCompra($idUsuario, $idTicket){
+    
+    // Se hace la conexión a la Base de datos
+    $conn = realizarConexionBD();
+    
+    // Se hace la consulta a la Base de Datos
+    $sql = "SELECT * FROM compras WHERE id_usuario = ".$idUsuario." AND id_ticket = ".$idTicket." ";
+    $result = mysqli_query($conn, $sql);    
+
+    if($result->num_rows != 0){
+        return true;
+    }else{
+        return false;
+    }
+    
+}
 
 
 
