@@ -2,7 +2,7 @@
 <html lang="es">
     <head>
         <meta charset="UTF-8">
-        <title>Inicio Usuario</title>
+        <title>Lista_tickets</title>
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
         <link rel="stylesheet" href="../css/styles.css">
     </head>
@@ -16,11 +16,18 @@
             <!-- Select con los tickets que se pueden comprar-->
             <select class="form-select mb-3" aria-label="Default select example" name="tipo_ticket">
                 <option selected>Selecciona una opción...</option>
-                    <option value="1">Concierto de Ariana Grande</option>
+                
+                    <?php 
+                        // Llamo la función que genera los options de este select.
+                        generarOptionsTickets() 
+                    ?>
+                
+                  <!--  <option value="1">Concierto de Ariana Grande</option>
                     <option value="2">Partido del Real Madrid</option>
                     <option value="3">Partido del Betis</option>
                     <option value="4">Concierto de Beyoncé</option>
-                    <option value="5">Fórmula 1</option>
+                    <option value="5">Fórmula 1</option> -->
+                    
             </select>
             
             <button type="submit" class="btn btn-success mb-3">Comprar ticket</button>

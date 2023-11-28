@@ -57,12 +57,13 @@ function cerrarSesion($nombre, $id){
     
 }
 
-
+// *****************************************************************************
+// Funciones de usuario normal
 
 /**
  * Esta función muestra los tickets del usuario.
  */
-function mostrarTickets(){
+function mostrarTicketsUsuario(){
     
     try {
         
@@ -104,7 +105,7 @@ function mostrarTickets(){
  * Esta función genera la tabla con la información de los
  * tickets que el usuario ha comprado.
  * 
- * Esta función se crea para que la función "mostrarTickets()"
+ * Esta función se crea para que la función "mostrarTicketsUsuario()"
  * no tenga tantas líneas de código.
  */
 function tablaTicketsUsuario($result){
@@ -135,19 +136,21 @@ function tablaTicketsUsuario($result){
     
 }
 
+
+
 /**
  * Esta función inserta una nueva compra del usuario.
  * 
- * @param [int] $idTicket
+ * @param [int] $idTicketCompra
  */
-function insertartCompraUsuario($idTicket){
+function insertarCompraUsuario($idTicketCompra){
     
     try {
         
         $idUsuario = $_COOKIE['idUsuario'];
-
+        
         // Comprobar que la compra no se repite      
-        $yaInsertado = comprobarCompra($idUsuario, $idTicket);
+        $yaInsertado = comprobarCompra($idUsuario, $idTicketCompra);
         
         if($yaInsertado == true){
             echo '<div class="alert alert-danger" role="alert">
@@ -158,7 +161,7 @@ function insertartCompraUsuario($idTicket){
             $conn = realizarConexionBD();
 
             // Se hace la consulta a la Base de Datos
-            $sql = "INSERT INTO compras (id_usuario, id_ticket, fecha_compra) VALUES (".$idUsuario.", ".$idTicket.", CURDATE())";
+            $sql = "INSERT INTO compras (id_usuario, id_ticket, fecha_compra) VALUES (".$idUsuario.", ".$idTicketCompra.", CURDATE())";
             $result = mysqli_query($conn, $sql);    
 
             echo '<div class="alert alert-success" role="alert">
@@ -202,7 +205,124 @@ function comprobarCompra($idUsuario, $idTicket){
 }
 
 
+/**
+ * Esta función genera un select formado por los tickets que el usuario ha comprado.
+ * El select se encuentra en un formulario que envía los resultados por POST
+ *  a la misma página en el que se encuentra el formulario.
+ */
+function listar_tickets_usuario(){
+    
+    try {
+        
+        $idUsuario = $_COOKIE['idUsuario'];
+        
+        // Se hace la conexión a la Base de datos
+        $conn = realizarConexionBD();
+        
+        // Se hace la consulta a la Base de Datos
+        $sql = "SELECT * FROM tickets "
+                . "WHERE id_ticket IN (SELECT id_ticket FROM compras WHERE id_usuario = ".$idUsuario.") ";
+        $result = mysqli_query($conn, $sql);    
+        
+        echo '<form method="post" action="./inicio_usuario_normal.php">';
+        
+            echo '<select class="form-select mb-3" aria-label="Default select example" name="ticket_borrar">';
 
+                echo '<option selected>Selecciona el ticket que deseas devolver...</option>';
+
+                generarOptionsTicketsUsuario($result);
+
+            echo '</select>';
+
+            echo '<button type="submit" class="btn btn-success mb-3">Devolver Ticket</button>';
+        
+        echo '</form>';
+        
+    } catch (Exception $exc) {
+        echo '<div class="alert alert-danger" role="alert">
+                La página está en mantenimiento, inténtalo de nuevo más tarde
+              </div>';
+    }
+
+    
+}
+
+/**
+ * Esta función genera los options del select creado con la función 
+ * "listar_tickets_usuario()".
+ */
+function generarOptionsTickets(){
+    
+    // Se hace la conexión a la Base de datos
+    $conn = realizarConexionBD();
+
+    // Se hace la consulta a la Base de Datos
+    $sql = "SELECT * FROM tickets";
+    $result = mysqli_query($conn, $sql);  
+    
+    while($fila = mysqli_fetch_assoc($result)){
+        echo "<option value='" . $fila['id_ticket'] . "'>" . $fila['nombre_ticket'] 
+                ." ---->  Vencimiento: ".$fila['fecha_ven']." </option>";
+    }//while
+    
+}
+
+
+
+/**
+ * Esta función rellena el select formado por los 
+ * tickets que el usuario ha comprado.
+ * 
+ * @param type $result
+ */
+function generarOptionsTicketsUsuario($result){
+    
+    // Añadir cada ticket a un "option".
+    while ($fila = mysqli_fetch_assoc($result)) {
+        echo "<option value='" . $fila['id_ticket'] . "'>" . $fila['nombre_ticket'] 
+                ." ---->  Vencimiento: ".$fila['fecha_ven']." </option>";
+    }//while
+    
+}
+
+/**
+ * Esta función borra el ticket indicado por el usuario.
+ * 
+ * @param [int] $idTicketBorrar
+ */
+function borrarCompra($idTicketBorrar){
+    
+    try {
+        
+        $idUsuario = $_COOKIE['idUsuario'];
+        
+        // Se hace la conexión a la Base de datos
+        $conn = realizarConexionBD();
+        
+        // Se hace la consulta a la Base de Datos
+        $sql = "DELETE FROM compras WHERE id_usuario = ".$idUsuario." AND id_ticket = ".$idTicketBorrar." ";
+        $result = mysqli_query($conn, $sql);    
+        
+        echo '<div class="alert alert-success" role="alert">
+                El ticket ha sido devuelto.
+              </div>';
+        
+    } catch (Exception $exc) {
+        echo '<div class="alert alert-danger" role="alert">
+                La página está en mantenimiento, inténtalo de nuevo más tarde
+              </div>';
+    }
+
+    
+}
+
+// *****************************************************************************
+// Funciones de usuario administrador
+
+
+
+
+//******************************************************************************
 
 /**
  * Esta función se utiliza para conectarnos a la Base de Datos

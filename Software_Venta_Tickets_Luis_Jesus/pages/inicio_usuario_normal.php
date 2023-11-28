@@ -65,6 +65,11 @@
             
             <br>
             
+            <!-- Mostrar una lista con los tickets del usuario. El usuario selecciona el ticket que desea borrar -->
+            <a class="btn btn-primary mb-3" href="./inicio_usuario_normal.php?accion=borrar_tickets_lista">Devolver tickets</a>
+            
+            <br>
+            
             <!-- Cerrar la sesión -->
             <a class="btn btn-secondary mb-3" href="./inicio_usuario_normal.php?accion=cerrar_sesion" role="button">Cerrar sesión</a>
             
@@ -77,7 +82,7 @@
                     
                     // Mostrar los tickets que tiene el usuario
                     if($accion == 'mostrar_tickets'){
-                        mostrarTickets();
+                        mostrarTicketsUsuario();
                     }
                     
                     // Mostrar la lista de los tickets que se pueden comprar
@@ -89,6 +94,9 @@
                      *  Mostrar los ticktes del usuario, para que este seleccione
                      *  el ticket que desea borrar.
                      */
+                    if($accion == 'borrar_tickets_lista'){
+                        listar_tickets_usuario();
+                    }
                     
                     // Cerrar la sesión
                     if($accion == "cerrar_sesion"){
@@ -97,16 +105,31 @@
                         cerrarSesion($nombre, $id);
                     }//if
                     
-                }
+                }//if
                 
-                // Comprar ticket seleccionado en la lista
+                /*
+                 *  Comprar ticket seleccionado en la lista.
+                 *  "insertarCompraUsuario()"
+                 */
                 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
-                    $idTicket = filter_input(INPUT_POST, 'tipo_ticket');
-                    if(isset($idTicket)){
-                        insertartCompraUsuario($idTicket);
-                    } 
-                }
+                    /*
+                     *  Se inicializa esta variable.
+                     *  Su valor viene del select de lista_tickets.php.
+                     *  Si la variable está inicializada,
+                     *   se ejecuta la función "insertarCompraUsuario()". 
+                     */
+                    $idTicketCompra = filter_input(INPUT_POST, 'tipo_ticket');
+                        if(isset($idTicketCompra)){
+                            insertarCompraUsuario($idTicketCompra);
+                        }//if
+                    
+                    $idTicketBorrar = filter_input(INPUT_POST, 'ticket_borrar');
+                        if(isset($idTicketBorrar)){
+                            borrarCompra($idTicketBorrar);
+                        }//if
+                    
+                }//if
                 
             ?>
             
