@@ -87,7 +87,7 @@
                     
                     // Mostrar la lista de los tickets que se pueden comprar
                     if($accion == 'comprar_tickets_lista'){
-                        include './lista_tickets.php';
+                        include '../includes/lista_tickets_modificar.php';
                     }
                    
                     /*
@@ -107,23 +107,16 @@
                     
                 }//if
                 
-                /*
-                 *  Comprar ticket seleccionado en la lista.
-                 *  "insertarCompraUsuario()"
-                 */
+                // La página recibe un POST de si misma
                 if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
-                    /*
-                     *  Se inicializa esta variable.
-                     *  Su valor viene del select de lista_tickets.php.
-                     *  Si la variable está inicializada,
-                     *   se ejecuta la función "insertarCompraUsuario()". 
-                     */
+                    // Insertar una nueva compra del usuario
                     $idTicketCompra = filter_input(INPUT_POST, 'tipo_ticket');
                         if(isset($idTicketCompra)){
                             insertarCompraUsuario($idTicketCompra);
                         }//if
                     
+                    // Borrar compra del usuario
                     $idTicketBorrar = filter_input(INPUT_POST, 'ticket_borrar');
                         if(isset($idTicketBorrar)){
                             borrarCompra($idTicketBorrar);

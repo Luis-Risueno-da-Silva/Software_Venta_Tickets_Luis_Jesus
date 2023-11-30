@@ -75,7 +75,7 @@ function mostrarTicketsUsuario(){
         $conn = realizarConexionBD();
 
         // Se hace la consulta a la Base de Datos
-        $sql = "select nombre_ticket, CONCAT(precio, '€') 'Precio', fecha_ven from tickets 
+        $sql = "select nombre_ticket, CONCAT(FORMAT(precio, 2), ' €') AS Precio, fecha_ven from tickets 
                 where id_ticket IN (SELECT id_ticket FROM compras WHERE id_usuario = ".$id.")";
         $result = mysqli_query($conn, $sql);
     
@@ -162,7 +162,7 @@ function insertarCompraUsuario($idTicketCompra){
 
             // Se hace la consulta a la Base de Datos
             $sql = "INSERT INTO compras (id_usuario, id_ticket, fecha_compra) VALUES (".$idUsuario.", ".$idTicketCompra.", CURDATE())";
-            $result = mysqli_query($conn, $sql);    
+            mysqli_query($conn, $sql);    
 
             echo '<div class="alert alert-success" role="alert">
                     Compra realizada con éxito.
@@ -220,7 +220,7 @@ function listar_tickets_usuario(){
         $conn = realizarConexionBD();
         
         // Se hace la consulta a la Base de Datos
-        $sql = "SELECT * FROM tickets "
+        $sql = "SELECT nombre_ticket, CONCAT(FORMAT(precio, 2), ' €') AS Precio, fecha_ven FROM tickets "
                 . "WHERE id_ticket IN (SELECT id_ticket FROM compras WHERE id_usuario = ".$idUsuario.") ";
         $result = mysqli_query($conn, $sql);    
         
@@ -257,12 +257,14 @@ function generarOptionsTickets(){
     $conn = realizarConexionBD();
 
     // Se hace la consulta a la Base de Datos
-    $sql = "SELECT * FROM tickets";
+    $sql = "SELECT id_ticket, nombre_ticket, fecha_ven, "
+            . "CONCAT(FORMAT(precio, 2), ' €') AS Precio FROM tickets";
     $result = mysqli_query($conn, $sql);  
     
     while($fila = mysqli_fetch_assoc($result)){
         echo "<option value='" . $fila['id_ticket'] . "'>" . $fila['nombre_ticket'] 
-                ." ---->  Vencimiento: ".$fila['fecha_ven']." </option>";
+                ." ----->  Vencimiento: ".$fila['fecha_ven']." "
+                . "-----> Precio: ".$fila['Precio']." </option>";
     }//while
     
 }
@@ -280,13 +282,14 @@ function generarOptionsTicketsUsuario($result){
     // Añadir cada ticket a un "option".
     while ($fila = mysqli_fetch_assoc($result)) {
         echo "<option value='" . $fila['id_ticket'] . "'>" . $fila['nombre_ticket'] 
-                ." ---->  Vencimiento: ".$fila['fecha_ven']." </option>";
+                ." ----> Vencimiento: ".$fila['fecha_ven']." "
+                . "----> Precio: ".$fila['Precio']."</option>";
     }//while
     
 }
 
 /**
- * Esta función borra el ticket indicado por el usuario.
+ * Esta función devuelve el ticket indicado por el usuario.
  * 
  * @param [int] $idTicketBorrar
  */
@@ -319,6 +322,164 @@ function borrarCompra($idTicketBorrar){
 // *****************************************************************************
 // Funciones de usuario administrador
 
+/**
+ * Esta función hace una consulta a la base de datos de todos los tickets.
+ */
+function mostrarTickets(){
+    
+    try {
+        
+        echo '<p class="fs-3 fw-bold text-success">Los tickets de la Base de Datos son:</p>';
+        
+        // Se hace la conexión a la Base de datos
+        $conn = realizarConexionBD();
+
+        // Se hace la consulta a la Base de Datos
+        $sql = "SELECT tipo, nombre_ticket, CONCAT(FORMAT(precio, 2), ' €') AS Precio, fecha_ven FROM tickets ";
+        $result = mysqli_query($conn, $sql);   
+
+        if($result->num_rows != 0){
+            tablaTickets($result);
+        }else{
+              echo '<div class="alert alert-danger" role="alert">
+                No hay tickets en la Base de Datos.
+              </div>'; 
+        }
+        
+    } catch (Exception $exc) {
+        echo '<div class="alert alert-danger" role="alert">
+                No se puede acceder a la Base de Datos.
+              </div>';
+    }
+
+    
+}
+
+/**
+ * Esta fucnión genera una tabla que contiene información de todos los tickets
+ * de la Base de Datos.
+ * 
+ * @param type $result
+ */
+function tablaTickets($result){
+    
+        echo '<table class="table table-striped-columns">';
+    
+        echo '<tr>';
+            echo '<th>Tipo</th>';
+            echo '<th>Nombre</th>';
+            echo '<th>Precio</th>';
+            echo '<th>Fecha de vencimiento</th>';
+        echo '</tr>';
+    
+        while ($fila = mysqli_fetch_assoc($result)) {
+            echo '<tr>';
+                echo '<td>'.$fila['tipo'].'</td>';
+                echo '<td>'.$fila['nombre_ticket'].'</td>';
+                echo '<td>'.$fila['Precio'].'</td>';
+                echo '<td>'.$fila['fecha_ven'].'</td>';
+            echo '</tr>';
+        }//while
+        
+    echo '</table>';
+    
+}
+
+/**
+ * Esta función inserta un nuevo ticket con los datos obtenidos en 
+ * el formulario.
+ * 
+ * @param [string] $tipo_ticket
+ * @param [string] $nom_ticket
+ * @param [double] $precio_ticket
+ * @param [date] $fec_vencimiento
+ */
+function insertarNuevoTicket($tipo_ticket, $nom_ticket, $precio_ticket, $fec_vencimiento){
+
+    try {
+        
+        // Se hace la conexión a la Base de datos
+        $conn = realizarConexionBD();
+
+        // Se hace la consulta a la Base de Datos
+        $sql = "INSERT INTO tickets (tipo, nombre_ticket, precio, fecha_ven)"
+                . "VALUES ('".$tipo_ticket."', '".$nom_ticket."', ".$precio_ticket.", '".$fec_vencimiento."') ";
+        mysqli_query($conn, $sql);
+        
+        echo '<div class="alert alert-success" role="alert">'
+            . 'Ticket insertado con éxito'
+                . '</div>';
+        
+    } catch (Exception $exc) {
+        echo '<div class="alert alert-danger" role="alert">
+                No se puede acceder a la Base de Datos.
+              </div>';
+    }
+    
+}
+
+
+/**
+ * Esta función se utiliza para eliminar ticktes de la Base de Datos
+ * 
+ * @param [integer] $id_ticket_eliminar
+ */
+function eliminarTicket($id_ticket_eliminar){
+    
+    try {
+        
+        // Se hace la conexión a la Base de datos
+        $conn = realizarConexionBD();
+
+        // Se hace la consulta a la Base de Datos
+        $sql = "DELETE FROM tickets WHERE id_ticket = ".$id_ticket_eliminar."";
+        mysqli_query($conn, $sql);
+        
+        echo '<div class="alert alert-success" role="alert">'
+            . 'Ticket eliminado con éxito'
+                . '</div>';
+        
+    } catch (Exception $exc) {
+        echo '<div class="alert alert-danger" role="alert">
+                No se puede acceder a la Base de Datos.
+              </div>';
+    }
+
+    
+}
+
+/**
+ * Esta función se utiliza para modificar los tickets.
+ * 
+ * @param [integer] $id_ticket_modificar
+ * @param [string] $tipo_ticket_modificar
+ * @param [string] $nom_ticket_modificar
+ * @param [double] $precio_ticket_modificar
+ * @param [date] $fecha_ven_ticket_modificar
+ */
+function modificarTicket($id_ticket_modificar, $tipo_ticket_modificar, $nom_ticket_modificar, $precio_ticket_modificar, $fecha_ven_ticket_modificar){
+    
+    try {
+        // Se hace la conexión a la Base de datos
+        $conn = realizarConexionBD();
+
+        // Se hace la consulta a la Base de Datos
+        $sql = "UPDATE tickets SET tipo = '".$tipo_ticket_modificar."', nombre_ticket = '".$nom_ticket_modificar."', "
+                . "precio = ".$precio_ticket_modificar.", fecha_ven = '".$fecha_ven_ticket_modificar."' WHERE id_ticket = ".$id_ticket_modificar." ";
+        mysqli_query($conn, $sql);
+    
+        echo '<div class="alert alert-success" role="alert">'
+            . 'Ticket modificado con éxito'
+                . '</div>';
+        
+    } catch (Exception $exc) {
+        echo '<div class="alert alert-danger" role="alert">
+                No se puede acceder a la Base de Datos.
+              </div>';
+    }
+
+    
+}
 
 
 
