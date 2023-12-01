@@ -1,0 +1,9 @@
+Usuario Administrados:
+	Nombre: Luis
+	Correo: luisrisuenosilva@gmail.com
+	Contraseña: 2931.
+
+Usuario Normal:
+	Nombre: Tadeo
+	Correo: tadeo@gmail.com
+	Contraseña: tadeoContra1

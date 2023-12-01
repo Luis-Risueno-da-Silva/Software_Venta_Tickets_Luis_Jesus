@@ -14,7 +14,7 @@
         <form method="post" action="../pages/inicio_usuario_normal.php">
             
             <!-- Select con los tickets que se pueden comprar-->
-            <select class="form-select mb-3" aria-label="Default select example" name="tipo_ticket">
+            <select class="form-select mb-3" aria-label="Default select example" name="id_ticket">
                 <option selected>Selecciona una opción...</option>
                 
                     <?php 

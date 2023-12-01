@@ -48,7 +48,7 @@ $rol = 0;
                             <input type="password" class="form-control" name="pass__inicio--sesion">
                         </div>
 
-                        <button type="submit" class="btn btn-primary">Enviar</button>
+                        <button type="submit" class="btn btn-primary" name="iniciarSesion">Enviar</button>
                         <button type="reset" class="btn btn-secondary">Limpiar</button>
                     </form>
                 </article>
@@ -91,36 +91,56 @@ $rol = 0;
 
             <?php
             // Cuando ocurre un post
+            
+           
             if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
-                // Variable para iniciar la sesión
-                $correo__inicio = filter_input(INPUT_POST, 'correo__inicio--sesion');
-                $contraseña__inicio = filter_input(INPUT_POST, 'pass__inicio--sesion');
+                 // Si se pulsa el botón de iniciar sesión, tomar datos del formulario y llamar a iniciarSesion()
+                if(isset($_POST['iniciarSesion'])){
+                    
+                    // Variable para iniciar la sesión
+                    $correo__inicio = filter_input(INPUT_POST, 'correo__inicio--sesion');
+                    $contraseña__inicio = filter_input(INPUT_POST, 'pass__inicio--sesion');
 
-                if (isset($correo__inicio) && isset($contraseña__inicio)) {
+                    if (isset($correo__inicio) && isset($contraseña__inicio)) {
 
-                    // Llamo a la función para iniciar sesión
-                    iniciarSesion($correo__inicio, $contraseña__inicio);
-                }//if
+                        // Llamo a la función para iniciar sesión
+                        iniciarSesion($correo__inicio, $contraseña__inicio);
+                    }else{
+                       echo '<div class="alert alert-danger" role="alert"> Rellene todos los campos </div>'; 
+                    }
+                    
+                }//if -- Iniciar Sesión
+                
+                //si se pulsa el boton de registro, tomar datos del formulario y llamar a insertarUsuario()
+                if (isset($_POST['registrarse'])) {
+                    $contraseña = filter_input(INPUT_POST, 'contraseña');                
+                    $contraseña_repetir = filter_input(INPUT_POST, 'contraseña_repetir');
+                    $correo = filter_input(INPUT_POST, 'correo');
+                    $nombre = filter_input(INPUT_POST, 'nombre');
+
+                    //control campos vacios
+                    if ($correo == "" || $nombre == "" || $contraseña == "" || $contraseña_repetir == "") {
+                        echo '<div class="alert alert-danger" role="alert"> Rellene todos los campos </div>';
+                    }else{
+
+                        if($contraseña == $contraseña_repetir){
+
+                            //cifrado contraseña
+                            $contraseña_cifrada = cifrarPass($contraseña);
+                            $rol = 0;
+
+                            insertarUsuario($correo, $nombre, $contraseña_cifrada, $rol);
+
+                        }else{
+                            echo '<div class="alert alert-danger" role="alert"> Las contraseñas deben de coincidir </div>';
+                        }
+
+                    }   
+                }//if -- Registrarse
+                
             }
 
-            //si se pulsa el boton de registro, tomar datos del formulario y llamar a insertarUsuario()
-            if (isset($_POST['registrarse'])) {
-                $contraseña_repetir = filter_input(INPUT_POST, 'contraseña_repetir');
-                $correo = filter_input(INPUT_POST, 'correo');
-                $nombre = filter_input(INPUT_POST, 'nombre');
-
-                //cifrado contraseña
-                $contraseña = cifrarPass(filter_input(INPUT_POST, 'nombre'));
-                $rol = 0;
-
-                //control campos vacios
-                if ($correo == "" || $nombre == "" || $contraseña == "" || $contraseña_repetir == "") {
-                    echo '<div class="alert alert-danger" role="alert"> Rellene todos los campos </div>';
-                } else {
-                    insertarUsuario($correo, $nombre, $contraseña, $rol);
-                }
-            }
             ?>
 
         </main>
