@@ -1,6 +1,5 @@
 <?php
 include './libraries/db_funciones.php';
-
 //variables inicializadas a vacio
 $nombre = "";
 $correo = "";
@@ -114,14 +113,13 @@ $rol = 0;
                 //cifrado contraseña
                 $contraseña = cifrarPass(filter_input(INPUT_POST, 'nombre'));
                 $rol = 0;
-                
+
                 //control campos vacios
                 if ($correo == "" || $nombre == "" || $contraseña == "" || $contraseña_repetir == "") {
-                   echo '<div class="alert alert-danger" role="alert"> Rellene todos los campos </div>';
-                }else{
+                    echo '<div class="alert alert-danger" role="alert"> Rellene todos los campos </div>';
+                } else {
                     insertarUsuario($correo, $nombre, $contraseña, $rol);
                 }
-                
             }
             ?>
 
