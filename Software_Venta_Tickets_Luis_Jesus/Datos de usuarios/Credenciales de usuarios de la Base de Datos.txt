@@ -1,4 +1,4 @@
-Usuario Administrados:
+Usuario Administrador:
 	Nombre: Luis
 	Correo: luisrisuenosilva@gmail.com
 	Contraseña: 2931.
